@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
     }
 })
 
+
 const Game = () => {
     return (
         <View style={styles.container}>

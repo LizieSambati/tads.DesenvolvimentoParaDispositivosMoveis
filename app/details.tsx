@@ -4,8 +4,6 @@
 // 	Dormir: Irá colocar o bichinho para dormir, aumentando seu atributo “sono”
 // 	Brincar: Irá abrir a tela de jogos
 
-import { StyleSheet, Text, View } from "react-native";
-
 // deve mostrar:
 // 	imagem do bichinho
 // 	status (morto, crítico, muito triste, triste, ok, bem, muito bem)
@@ -21,6 +19,8 @@ import { StyleSheet, Text, View } from "react-native";
 // 		diversão: o bichinho se tornará mais feliz brincando nos jogos
 // 			Irá abrir a tela de jogos
 
+import { StyleSheet, Text, View } from "react-native";
+
 
 const styles = StyleSheet.create({
     container: {
@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
         color: "#f7c8"
     }
 })
-
 
 
 const Details = () => {
