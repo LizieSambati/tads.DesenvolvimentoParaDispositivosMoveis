@@ -1,0 +1,94 @@
+------ Tamagotchi ------
+
+tamago = ovo
+tchi ~= pequeno, fofinho
+
+Projeto:
+
+nível do bichinho:
+
+(alterar forma de comer/banheiro conforme nível?)
+
+	bebê 1
+	bebê 2
+	bebê 3
+		minigame: 1
+
+	criança 1
+	criança 2
+		minigame: 1 e 2
+	adolescente
+	adulto
+		minigame: 1, 2 e 3
+
+
+alerta?: avisar quando o bichinho necessita de cuidados
+
+
+Telas
+
+- Tela de cadastro de bichinhos:
+Informar os campos para cadastro: Nome; Imagem
+
+- Tela de listagem de bichinhos:
+	nome
+	imagem (nível?)
+	peso?
+	status (morto, crítico, muito triste, triste, ok, bem, muito bem)
+	atributos(saúde): alimentação + sono + higiene + diversão
+
+
+- Tela de detalhes do bichinho:
+
+Acessada através da listagem
+deve mostrar:
+	imagem do bichinho
+	status (morto, crítico, muito triste, triste, ok, bem, muito bem)
+	fornecer as opções:
+		fome: dar comida aumenta o nível de alimentação
+			0% alimentado a 100% alimentado
+
+		sono: a iluminação determina se o bichinho irá dormir ou não
+			Luz acesa/apagada
+
+		higiene: cuidar dos dejetos do bichinho
+
+		diversão: o bichinho se tornará mais feliz brincando nos jogos
+			Irá abrir a tela de jogos
+
+- Tela de jogos:
+Deverão ser implementados 2 minigames distintos e em telas separadas (exemplo: jogo da velha, jogo da memória, par ou impar, pedra-papel-tesoura, etc.)
+Um dos minigames deve utilizar algum módulo nativo do dispositivo (giroscópio, câmera, localização, etc.)
+
+
+
+Lógica de saúde do bichinho:
+
+- Atributos
+	alimentação + sono + higiene + diversão
+
+Os atributos devem ter seu valor descontado conforme o tempo passa
+	Exemplo: 
+		a cada 1h o bichinho perde 1 ponto alimentação, sono, diversão, higiene...
+Os atributos vão de 0 a 100
+
+Caso o bichinho tenha seus atributos zerados, ele morre
+
+- Status
+O status dos bichinhos é calculado através da soma dos atributos (nascer em 180 pontos de atributo?)
+	0: status “morto”
+	De 1 a 50: status “crítico”
+	De 51 a 100: status “muito triste”
+	De 101 - 150: status “triste”
+	De 151 - 200: status “ok”
+	De 201 - 250: status “bem”
+	De 252 - 300: status “muito bem”
+
+
+Implementação:
+
+O app será offline, ou seja, deverá utiliza um banco de dados local para armazenar as informações
+O banco a ser escolhido fica a critério do aluno (SQLite, Watermellon, Realm, etc)
+O app pode ser desenvolvido utilizando Expo ou React Native CLI
+O app deverá ser compilado, não importa se para Android, iOS ou ambos
+O app deverá ser visualmente agradável e o layout deve fazer sentido com as regras propostas

@@ -6,18 +6,6 @@
 
 import { Button, StyleSheet, Text, View } from "react-native";
 
-const styles = StyleSheet.create({
-    container: {
-        justifyContent: "center",
-        alignItems: "center",
-        flex: 1,
-    },
-    text: {
-        color: "#f1f8"
-    }
-})
-
-
 const Game = () => {
     return (
         <View style={styles.container}>
@@ -28,9 +16,19 @@ const Game = () => {
 
                 mostrar status de felicidade
             </Text>
-
+            <Text>Botão ir para Status</Text>
         </View>
     );
 }
-
 export default Game;
+
+const styles = StyleSheet.create({
+    container: {
+        justifyContent: "center",
+        alignItems: "center",
+        flex: 1,
+    },
+    text: {
+        color: "#f1f8"
+    }
+})

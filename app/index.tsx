@@ -1,10 +1,23 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { StyleSheet, Text, View } from "react-native";
+import { Link } from 'expo-router';
 
 
 const Stack = createStackNavigator()
+
+export default function Index() {
+    return (
+        <View>
+            <Text style={styles.text}>
+                ir para status
+            </Text>
+            <Link href={"/register"}>Registrar</Link>
+            {/* quando já tiver bichinho criado, como fazer? */}
+        </View>
+
+    );
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -16,14 +29,3 @@ const styles = StyleSheet.create({
         color: "#f12"
     }
 })
-
-export default function Index() {
-    return (
-        <View>
-            <Text style={styles.text}>
-                testanndoooo index
-            </Text>
-        </View>
-
-    );
-}

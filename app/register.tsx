@@ -2,22 +2,22 @@
 // Informar os campos para cadastro: Nome; Imagem
 
 import { Button, Text, View } from "react-native";
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-const Stack = createStackNavigator();
+type Props = {
+    navigation: StackNavigationProp<any>;
+};
 
-
-const register = ({ navigation }) => {
+const Register = ({ navigation }: Props) => {
     return (
         <View>
-            <Text>registrar bichinho</Text>
+            <Text>Campo definir Nome</Text>
+            <Text>Campo definir Imagem</Text>
             <Button
-                title="Go to Details"
-                onPress={() => navigation.navigate('Details')}
+                title="JOGAR!"
+                onPress={() => navigation.navigate('Status')}
             />
         </View>
     );
 }
-
-export default register;
+export default Register;
