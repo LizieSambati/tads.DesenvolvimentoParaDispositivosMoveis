@@ -12,7 +12,7 @@ export default function Index() {
             <Text style={styles.text}>
                 ir para status
             </Text>
-            <Link href={"/register"}>Registrar</Link>
+            <Link href={"/create"}>Registrar</Link>
             {/* quando já tiver bichinho criado, como fazer? */}
         </View>
 

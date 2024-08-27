@@ -2,13 +2,15 @@
 // Informar os campos para cadastro: Nome; Imagem
 
 import { Button, Text, View } from "react-native";
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from "@react-navigation/stack";
 
-type Props = {
-    navigation: StackNavigationProp<any>;
-};
 
-const Register = ({ navigation }: Props) => {
+type CreateScreenNavigationProp = StackNavigationProp<StackParamList, 'Create'>;
+
+const Create = () => {
+
+    const navigation = useNavigation()
     return (
         <View>
             <Text>Campo definir Nome</Text>
@@ -20,4 +22,4 @@ const Register = ({ navigation }: Props) => {
         </View>
     );
 }
-export default Register;
+export default Create;
