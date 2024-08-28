@@ -1,53 +1,54 @@
 import { Text } from "react-native"
 
-import Medicine from "@/components/Medicine";
 
-import Hunger from "@/components/Hunger";
-import Sleep from "@/components/Sleep";
-import Hygiene from "@/components/Hygiene";
-import Fun from "@/components/Fun";
-
+// import Hunger from "@/components/Hunger";
+// import Sleep from "@/components/Sleep";
+// import Hygiene from "@/components/Hygiene";
+// import Fun from "@/components/Fun";
 
 
-type Dead = {
-    message: string;
-    description?: string;
-}
-type Critical = {
-    message: string;
-    description?: string;
-}
-type VerySad = {
-    message: string;
-    description?: string;
-}
-type Sad = {
-    message: string;
-    description?: string;
-}
-type Ok = {
-    message: string;
-    description?: string;
-}
-type Good = {
-    message: string;
-    description?: string;
-}
-type VeryGood = {
-    message: string;
-    description?: string;
-}
+
+// type Dead = {
+//     message: string;
+//     description?: string;
+// }
+// type Critical = {
+//     message: string;
+//     description?: string;
+// }
+// type VerySad = {
+//     message: string;
+//     description?: string;
+// }
+// type Sad = {
+//     message: string;
+//     description?: string;
+// }
+// type Ok = {
+//     message: string;
+//     description?: string;
+// }
+// type Good = {
+//     message: string;
+//     description?: string;
+// }
+// type VeryGood = {
+//     message: string;
+//     description?: string;
+// }
 
 type Props = {
-    ???
-}
+    hunger: number;
+    sleep: number;
+    hygiene: number;
+    fun: number;
+    play: () => void; // Recebe a função como prop ????????
+};
 
 
+const Status = ({ hunger, sleep, hygiene, fun }: Props) => {
 
-
-const Status = ({ Hunger, Sleep, Hygiene, Fun }: Props) => {
-
-    let status: number = Hunger + Sleep + Hygiene + Fun;
+    let status: number = hunger + sleep + hygiene + fun;
     let message: string;
 
     if (status <= 0) {
@@ -70,8 +71,7 @@ const Status = ({ Hunger, Sleep, Hygiene, Fun }: Props) => {
 
     return (
         <Text>
-            situação do bichinho
-            {message}
+            situação do bichinho: {message}
         </Text >
     );
 }
