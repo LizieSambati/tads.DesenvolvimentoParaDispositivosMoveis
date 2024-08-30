@@ -1,82 +1,66 @@
-
-
-import Hunger from "@/components/Hunger";
-import Sleep from "@/components/Sleep";
-import Hygiene from "@/components/Hygiene";
-import Fun from "@/components/Fun";
-
-
 import React from "react";
-import { createContext, useContext, useState } from "react";
-import { Button, View } from "react-native";
+import { useState } from "react";
 
-
-type AttributesState = {
+type AttributesType = {
     hunger: number;
     sleep: number;
     hygiene: number;
     fun: number;
-};
-
-type AttributesActions = {
-    play: () => void;
     eat: () => void;
     clean: () => void;
+    play: () => void;
     medicine: () => void;
+    rest: () => void;
+    // routine: () => void;
 };
 
-// Consolidar estado e ações em um tipo
-type AttributesContext = AttributesState & AttributesActions;
+export const Attributes = (): AttributesType => {
 
-const AttributesContext = createContext<AttributesContext | undefined>(undefined);
+    const [hunger, setHunger] = useState<number>(50);
+    const [sleep, setSleep] = useState<number>(50);
+    const [hygiene, setHygiene] = useState<number>(50);
+    const [fun, setFun] = useState<number>(50);
 
-export const useAttributes = () => {
-    return useContext(AttributesContext);
-};
-
-
-export const Attributes = () => {
-
-    const [hunger, setHunger] = useState(75);
-    const [sleep, setSleep] = useState(75);
-    const [hygiene, setHygiene] = useState(75);
-    const [fun, setFun] = useState(75);
-
+    const limit = (value: number) => {
+        if (value > 100) return 100;
+        if (value < 0) return 0;
+        return value;
+    };
 
     const eat = () => {
-        setHunger(hunger + 50);
-        setSleep(sleep + 0);
-        setHygiene(hygiene - 20);
-        setFun(fun + 15);
+        setHunger(limit(hunger + 50));
+        setSleep(limit(sleep + 0));
+        setHygiene(limit(hygiene - 20));
+        setFun(limit(fun + 15));
     };
 
     const clean = () => {
-        setHunger(hunger + 0);
-        setSleep(sleep + 0);
-        setHygiene(hygiene + 75);
-        setFun(fun + 10);
+        setHunger(limit(hunger + 0));
+        setSleep(limit(sleep + 0));
+        setHygiene(limit(hygiene + 75));
+        setFun(limit(fun + 10));
     };
 
     const play = () => {
-        setHunger(hunger - 5);
-        setSleep(sleep - 10);
-        setHygiene(hygiene - 5);
-        setFun(fun + 30);
+        setHunger(limit(hunger - 5));
+        setSleep(limit(sleep - 10));
+        setHygiene(limit(hygiene - 5));
+        setFun(limit(fun + 30));
     };
 
     const medicine = () => {
-        setHunger(hunger + 50);
-        setSleep(sleep + 50);
-        setHygiene(hygiene + 0);
-        setFun(fun + 50);
+        setHunger(limit(hunger + 75));
+        setSleep(limit(sleep + 75));
+        setHygiene(limit(hygiene + 0));
+        setFun(limit(fun + 75));
     };
 
-    // const rest = () => {
-    //     setHunger(hunger - ?);
-    //     setSleep(sleep - ?);
-    //     setHygiene(hygiene - ?);
-    //     setFun(fun + ?);
-    // };
+    const rest = () => {
+        setHunger(limit(hunger - 10));
+        setSleep(limit(sleep + 50));
+        setHygiene(limit(hygiene - 10));
+        setFun(limit(fun + 10));
+    };
 
     // const routine = () => {
     //     setHunger(hunger + ?);
@@ -85,48 +69,9 @@ export const Attributes = () => {
     //     setFun(fun + ?);
     // };
 
-    // return (
-    //     <View>
-    //         <Button title="Comer" onPress={eat} />
-    //         <Button title="Higiene" onPress={clean} />
-    //         <Button title="Jogar" onPress={play} />
-    //         <Button title="Remédio" onPress={medicine} />
-    //         {/* <Button title="Dormir" onPress={rest} /> */}
-    //     </View>
-    // );
-    const value = {
-        hunger,
-        sleep,
-        hygiene,
-        fun,
-        play,
-        eat,
-        clean,
-        medicine
+    return {
+        hunger, sleep, hygiene, fun,
+        eat, clean, play, medicine, rest
+        // routine,
     };
-
-    return (
-        <AttributesContext.Provider value={value}>
-            {???}
-        </AttributesContext.Provider>
-    );
 }
-
-
-
-
-
-
-
-// // Valor padrão para o contexto (opcional)
-// const defaultContextValue: AttributesContextType = {
-//     hunger: 75,
-//     sleep: 75,
-//     hygiene: 75,
-//     fun: 75,
-//     play: () => { },
-//     eat: () => { },
-//     clean: () => { },
-//     medicine: () => { }
-// };
-

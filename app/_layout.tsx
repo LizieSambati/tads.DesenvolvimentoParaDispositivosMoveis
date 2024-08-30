@@ -24,8 +24,8 @@ export default function RootLayout() {
         options={{ header: () => <Header title="detalhes" /> }}
       />
       <Stack.Screen
-        name="register"
-        options={{ header: () => <Header title="registrar" /> }}
+        name="create"
+        options={{ header: () => <Header title="novo bichinho!!!" /> }}
       />
       <Stack.Screen
         name="game"
