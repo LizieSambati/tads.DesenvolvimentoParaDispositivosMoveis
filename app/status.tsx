@@ -13,35 +13,40 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 const Status = () => {
 
   const router = useRouter();
-  // const { message, action } = Condition({message});
-
-  // Você pode usar `action()` aqui para disparar a ação se necessário. ?????
-
-
+  const { hunger, sleep, hygiene, fun } = Attributes();
+  const { message } = Condition({ hunger, sleep, hygiene, fun });
 
   return (
     <View style={styles.container}>
       <SafeAreaView>
         <Text style={styles.text}>
-          Nome
-          imagem
-          idade??
+          Nome do bichinho
         </Text>
 
-        <Text style={styles.text}>
-          {/* {message} */}
+        <Text>
+          imagem do bichinho
         </Text>
 
-        <TouchableOpacity
-          onPress={() => router.push('/details')}
-        >
-          <MaterialCommunityIcons name="apps" size={24} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => router.push('/game')}
-        >
-          <MaterialCommunityIcons name="gamepad-variant-outline" size={24} color="black" />
-        </TouchableOpacity>
+        <View>
+          <Text style={styles.textStatus}>
+            {message}
+            {/* idade do bichinho? */}
+          </Text>
+        </View>
+
+        <View style={styles.buttons}>
+          <TouchableOpacity style={styles.buttonsStyle}
+            onPress={() => router.push('/game')}
+          >
+            <MaterialCommunityIcons name="gamepad-variant-outline" size={64} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonsStyle}
+            onPress={() => router.push('/details')}
+          >
+            <MaterialCommunityIcons name="apps" size={64} color="black" />
+          </TouchableOpacity>
+
+        </View>
       </SafeAreaView>
     </View>
   );
@@ -57,10 +62,19 @@ const styles = StyleSheet.create({
   text: {
     color: "#f12"
   },
-  button: {
+  textStatus: {
+    fontSize: 20,
+    fontWeight: "500",
+    color: "black",
+  },
+  buttonsStyle: {
+    padding: 10,
+    // backgroundColor: 'red',
+  },
+  buttons: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'green',
+    // backgroundColor: 'green',
     padding: 10,
     borderRadius: 5,
     marginTop: 20,

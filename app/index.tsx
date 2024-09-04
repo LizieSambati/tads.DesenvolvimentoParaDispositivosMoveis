@@ -1,18 +1,32 @@
 import * as React from 'react';
-import { createStackNavigator } from '@react-navigation/stack'
-import { StyleSheet, Text, View } from "react-native";
-import { Link } from 'expo-router';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack'
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Link, useNavigation } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from './_layout';
 
-
-const Stack = createStackNavigator()
+type ScreenNavigationProp = CompositeNavigationProp<
+    StackNavigationProp<RootStackParamList, 'index'>,
+    StackNavigationProp<RootStackParamList>
+>;
 
 export default function Index() {
+    const navigation = useNavigation<ScreenNavigationProp>()
     return (
         <View>
-            <Text style={styles.text}>
-                ir para status
-            </Text>
-            <Link href={"/create"}>Registrar</Link>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('status')}
+            >
+                <MaterialCommunityIcons name="alien-outline" size={64} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('create')}
+            >
+                <MaterialCommunityIcons name="alien" size={64} color="black" />
+            </TouchableOpacity>
+
+            {/* <Link href={"/create"}>Registrar</Link> */}
             {/* quando já tiver bichinho criado, como fazer? */}
         </View>
 

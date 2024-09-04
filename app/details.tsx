@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useState, useEffect } from "react";
 import { TouchableOpacity, SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { Attributes } from "@/components/Attributes";
 import { Condition } from "@/components/Condition";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -26,13 +26,12 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 const Details = () => {
 
     const router = useRouter();
-    const { hunger, sleep, hygiene, fun, eat, clean, rest, medicine } = Attributes();
+    const { hunger, sleep, hygiene, fun, eat, clean, medicine, light, setLight } = Attributes();
     const [currentHunger, setHunger] = useState(hunger);
     const [currentSleep, setSleep] = useState(sleep);
     const [currentHygiene, setHygiene] = useState(hygiene);
     const [currentFun, setFun] = useState(fun);
 
-    // Atualiza os estados locais com os valores do Attributes
     useEffect(() => {
         setHunger(hunger);
         setSleep(sleep);
@@ -40,68 +39,83 @@ const Details = () => {
         setFun(fun);
     }, [hunger, sleep, hygiene, fun]);
 
-    // Atualiza a condição sempre que os valores mudarem
-    const { message } = Condition({ hunger: currentHunger, sleep: currentSleep, hygiene: currentHygiene, fun: currentFun });
+    const navigation = useNavigation()
 
-    // Função para executar a ação e atualizar os estados locais
+    const { message } = Condition({
+        hunger: currentHunger,
+        sleep: currentSleep,
+        hygiene: currentHygiene,
+        fun: currentFun
+    });
+
     const handleAction = (action: () => void) => {
         action();
-        // Atualiza os valores de estado depois da ação
         setHunger(hunger);
         setSleep(sleep);
         setHygiene(hygiene);
         setFun(fun);
     };
 
+    const toggleLight = () => {
+        setLight(!light);
+    };
+
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>
-                {message}
-            </Text>
+            <View style={styles.menuLight}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <MaterialCommunityIcons name="alien" size={48} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleLight}>
+                    <MaterialCommunityIcons
+                        name={light ? "lightbulb-on-outline" : "lightbulb"}
+                        size={48}
+                        color="black"
+                    />
+                </TouchableOpacity>
+            </View>
+            <View style={styles.statusContainer}>
+                <View style={styles.status}>
+                    <Text style={styles.text}>{hunger}%</Text>
+                    <MaterialCommunityIcons name="arm-flex-outline" size={48} color="black" />
+                </View>
+                <View style={styles.status}>
+                    <Text style={styles.text}>{hygiene}%</Text>
+                    <MaterialCommunityIcons name="paper-roll-outline" size={48} color="black" />
+
+                </View>
+                <View style={styles.status}>
+                    <Text style={styles.text}>{sleep}%</Text>
+                    <MaterialCommunityIcons name="sleep" size={48} color="black" />
+                </View>
+                <View style={styles.status}>
+                    <Text style={styles.text}>{fun}%</Text>
+                    <MaterialCommunityIcons name="star-face" size={48} color="black" />
+                </View>
+            </View>
             <Text style={styles.text}>
                 imagem,
             </Text>
-            <TouchableOpacity onPress={() => router.push('/status')}>
-                <MaterialCommunityIcons name="alien" size={24} color="black" />
-            </TouchableOpacity>
-            <View style={styles.status}>
-                <Text>{hunger}%</Text>
-                <MaterialCommunityIcons name="arm-flex-outline" size={24} color="black" />
+            <Text style={styles.text}>
+                {message}
+            </Text>
+            <View style={styles.statusContainer}>
+                <TouchableOpacity
+                    onPress={() => handleAction(eat)}>
+                    <MaterialCommunityIcons name="food" size={48} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => handleAction(clean)}>
+                    <MaterialCommunityIcons name="shower-head" size={48} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/game')}>
+                    <MaterialCommunityIcons name="gamepad-variant-outline" size={48} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => handleAction(medicine)}>
+                    <MaterialCommunityIcons name="pill" size={48} color="black" />
+                </TouchableOpacity>
             </View>
-            <View style={styles.status}>
-                <Text>{hygiene}%</Text>
-                <MaterialCommunityIcons name="paper-roll-outline" size={24} color="black" />
-                <MaterialCommunityIcons name="emoticon-poop" size={24} color="black" />
-            </View>
-            <View style={styles.status}>
-                <Text>{sleep}%</Text>
-                <MaterialCommunityIcons name="sleep" size={24} color="black" />
-            </View>
-            <View style={styles.status}>
-                <Text>{fun}%</Text>
-                <MaterialCommunityIcons name="star-face" size={24} color="black" />
-            </View>
-
-            <TouchableOpacity
-                onPress={() => handleAction(eat)}>
-                <MaterialCommunityIcons name="food" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => handleAction(clean)}>
-                <MaterialCommunityIcons name="shower-head" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => handleAction(rest)}>
-                <MaterialCommunityIcons name="lightbulb" size={24} color="black" />
-                <MaterialCommunityIcons name="lightbulb-on-outline" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('/game')}>
-                <MaterialCommunityIcons name="gamepad-variant-outline" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => handleAction(medicine)}>
-                <MaterialCommunityIcons name="pill" size={24} color="black" />
-            </TouchableOpacity>
 
             {/* botão configurações->resetar jogo??? */}
         </View>
@@ -111,9 +125,17 @@ export default Details;
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: "center",
+        // justifyContent: "center",
         alignItems: "center",
         flex: 1,
+    },
+    statusContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        // backgroundColor: 'green',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 20,
     },
     status: {
         alignItems: "center",
@@ -122,9 +144,18 @@ const styles = StyleSheet.create({
         bottom: 20,
         right: 20,
         height: 60,
-        backgroundColor: "#4fab",
+        backgroundColor: "#4c1b",
     },
     text: {
-        color: "#5178"
-    }
+        color: "#5178",
+        fontSize: 20,
+        fontWeight: "500",
+    },
+    menuLight: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignSelf: 'stretch',
+        padding: 10,
+        backgroundColor: "#4fab",
+    },
 })

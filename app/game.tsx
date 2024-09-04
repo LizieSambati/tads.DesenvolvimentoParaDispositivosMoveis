@@ -6,33 +6,35 @@
 // cara ou coroa, jogo da velha, forca, caça-palavra???
 
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { Condition } from "@/components/Condition";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { RootStackParamList } from "./_layout";
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import { CompositeNavigationProp } from "@react-navigation/native";
+
+type GameScreenNavigationProp = CompositeNavigationProp<
+    StackNavigationProp<RootStackParamList, 'game'>,
+    StackNavigationProp<RootStackParamList>
+>;
 
 const Game = () => {
-    const { message } = Condition({ message });
 
-    const router = useRouter();
+    const navigation = useNavigation<GameScreenNavigationProp>()
 
     return (
 
         <View style={styles.container}>
-
-            <Text style={styles.text}>
-                {message}
-            </Text>
-
-            <Text style={styles.text}>
-                ir para jogo 1
-                ir para jogo 2
-                ir para jogo 3...
-                mostrar status de felicidade
-            </Text>
             <TouchableOpacity
-                onPress={() => router.push('/status')}
+                onPress={() => navigation.navigate('status')}
             >
-                <MaterialCommunityIcons name="alien" size={24} color="black" />
+                <MaterialCommunityIcons name="alien" size={64} color="black" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => navigation.navigate('caraOuCoroa')}
+            >
+                <MaterialCommunityIcons name="bitcoin" size={64} color="black" />
             </TouchableOpacity>
         </View>
     );

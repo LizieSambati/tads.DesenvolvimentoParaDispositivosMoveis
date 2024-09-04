@@ -92,3 +92,13 @@ O banco a ser escolhido fica a critério do aluno (SQLite, Watermellon, Realm, e
 O app pode ser desenvolvido utilizando Expo ou React Native CLI
 O app deverá ser compilado, não importa se para Android, iOS ou ambos
 O app deverá ser visualmente agradável e o layout deve fazer sentido com as regras propostas
+
+
+
+
+
+
+
+
+ícones:
+<MaterialCommunityIcons name="emoticon-poop" size={48} color="black" />
