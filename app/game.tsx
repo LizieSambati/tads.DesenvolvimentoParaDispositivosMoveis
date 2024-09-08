@@ -8,10 +8,11 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useNavigation, useRouter } from 'expo-router';
 import { Condition } from "@/components/Condition";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { RootStackParamList } from "./_layout";
 import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import { CompositeNavigationProp } from "@react-navigation/native";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 type GameScreenNavigationProp = CompositeNavigationProp<
     StackNavigationProp<RootStackParamList, 'game'>,
@@ -25,6 +26,10 @@ const Game = () => {
     return (
 
         <View style={styles.container}>
+
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back-circle-outline" size={64} color="black" />
+            </TouchableOpacity>
             <TouchableOpacity
                 onPress={() => navigation.navigate('status')}
             >

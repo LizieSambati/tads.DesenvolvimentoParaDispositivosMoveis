@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import Condition from "./Condition";
 
 type AttributesType = {
     hunger: number;
@@ -19,7 +20,10 @@ export const Attributes = (): AttributesType => {
     const [sleep, setSleep] = useState<number>(50);
     const [hygiene, setHygiene] = useState<number>(50);
     const [fun, setFun] = useState<number>(50);
+
     const [light, setLight] = useState<boolean>(true);
+
+    const { message } = Condition({ hunger, sleep, hygiene, fun });
 
     const limit = (value: number) => {
         if (value > 100) return 100;
@@ -42,7 +46,7 @@ export const Attributes = (): AttributesType => {
     const clean = useCallback(() => {
         setHunger(limit(hunger + 0));
         setSleep(limit(sleep + 0));
-        setHygiene(limit(hygiene + 75));
+        setHygiene(limit(hygiene + 100));
         setFun(limit(fun + 10));
     }, [
         setHunger, hunger,
@@ -64,25 +68,28 @@ export const Attributes = (): AttributesType => {
     ]);
 
     const medicine = useCallback(() => {
-        setHunger(limit(hunger + 75));
-        setSleep(limit(sleep + 75));
-        setHygiene(limit(hygiene + 0));
-        setFun(limit(fun + 75));
+        if (message === "Crítico") {
+            setHunger(limit(hunger + 75));
+            setSleep(limit(sleep + 75));
+            setHygiene(limit(hygiene + 0));
+            setFun(limit(fun + 75));
+        }
     }, [
+        message,
         setHunger, hunger,
         setSleep, sleep,
         setHygiene, hygiene,
         setFun, fun
     ]);
 
-    useEffect(() => {
 
+    useEffect(() => {
         const timer = setInterval(() => {
             if (!light) {
                 setHunger(limit(hunger - 7));
                 setSleep(limit(sleep + 10));
                 setHygiene(limit(hygiene - 6));
-                setFun(limit(fun + 7));
+                setFun(limit(fun + 3));
             }
             if (light) {
                 setHunger(limit(hunger - 4));

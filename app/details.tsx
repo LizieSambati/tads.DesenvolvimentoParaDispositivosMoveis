@@ -66,6 +66,14 @@ const Details = () => {
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <MaterialCommunityIcons name="alien" size={48} color="black" />
                 </TouchableOpacity>
+
+                {message === "Crítico" && (
+                    <TouchableOpacity
+                        onPress={() => handleAction(medicine)}>
+                        <MaterialCommunityIcons name="pill" size={48} color="black" />
+                    </TouchableOpacity>
+                )}
+
                 <TouchableOpacity onPress={toggleLight}>
                     <MaterialCommunityIcons
                         name={light ? "lightbulb-on-outline" : "lightbulb"}
@@ -99,22 +107,23 @@ const Details = () => {
             <Text style={styles.text}>
                 {message}
             </Text>
+
             <View style={styles.statusContainer}>
                 <TouchableOpacity
                     onPress={() => handleAction(eat)}>
-                    <MaterialCommunityIcons name="food" size={48} color="black" />
+                    <MaterialCommunityIcons name="food" size={72} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => handleAction(clean)}>
-                    <MaterialCommunityIcons name="shower-head" size={48} color="black" />
+                    <MaterialCommunityIcons name="shower-head" size={72} color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/game')}>
-                    <MaterialCommunityIcons name="gamepad-variant-outline" size={48} color="black" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => handleAction(medicine)}>
-                    <MaterialCommunityIcons name="pill" size={48} color="black" />
-                </TouchableOpacity>
+            </View>
+            <View>
+                {message !== "Crítico" && (
+                    <TouchableOpacity onPress={() => router.push('/game')}>
+                        <MaterialCommunityIcons name="gamepad-variant-outline" size={112} color="black" />
+                    </TouchableOpacity>
+                )}
             </View>
 
             {/* botão configurações->resetar jogo??? */}
