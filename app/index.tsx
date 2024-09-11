@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { ImageBackground, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { StackNavigationProp } from '@react-navigation/stack'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from './_layout';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+// import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
+import galaxy from "assets/images/galaxy3.jpg";
 
 type ScreenNavigationProp = CompositeNavigationProp<
     StackNavigationProp<RootStackParamList, 'index'>,
@@ -15,30 +17,35 @@ type ScreenNavigationProp = CompositeNavigationProp<
 export default function Index() {
     const navigation = useNavigation<ScreenNavigationProp>()
     return (
-        <View>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('status')}
-            >
-                <MaterialCommunityIcons name="alien-outline" size={64} color="black" />
-            </TouchableOpacity>
-            <View>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('create')}
-                >
-                    <Ionicons name="planet" size={128} color="black" />
-                </TouchableOpacity>
-            </View>
-        </View>
+        <SafeAreaView style={styles.safeArea}>
+            <ImageBackground source={galaxy} style={styles.backgroundImage}>
+                <View>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('status')}
+                    >
+                        <MaterialCommunityIcons name="alien-outline" size={64} color="black" />
+                    </TouchableOpacity>
+
+                    <View>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('create')}
+                        >
+                            <MaterialCommunityIcons name="radioactive" size={128} color="black" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ImageBackground>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        justifyContent: "center",
-        alignItems: "center",
+    safeArea: {
         flex: 1,
     },
-    text: {
-        color: "#f12"
-    }
+    backgroundImage: {
+        flex: 1,
+        resizeMode: 'cover',
+        justifyContent: 'center',
+    },
 })

@@ -15,15 +15,15 @@ export default Header;
 
 const styles = StyleSheet.create({
     headerContainer: {
-        paddingTop: 62,
-        padding: 16,
-        backgroundColor: "#f56",
+        paddingTop: 24,
+        padding: 8,
+        backgroundColor: "#293624",
     },
     textTitle: {
         fontWeight: "bold",
         fontSize: 20,
         paddingBottom: 4,
-        color: "black",
+        color: "#D3B4D9",
         textAlign: "center"
     },
 })

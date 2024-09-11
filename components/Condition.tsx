@@ -58,5 +58,4 @@ export const Condition = ({ hunger, sleep, hygiene, fun }: AttributesProps) => {
 
     return { message };
 };
-
 export default Condition;

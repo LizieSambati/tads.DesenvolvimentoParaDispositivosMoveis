@@ -20,7 +20,6 @@ export const Attributes = (): AttributesType => {
     const [sleep, setSleep] = useState<number>(50);
     const [hygiene, setHygiene] = useState<number>(50);
     const [fun, setFun] = useState<number>(50);
-
     const [light, setLight] = useState<boolean>(true);
 
     const { message } = Condition({ hunger, sleep, hygiene, fun });
@@ -33,81 +32,71 @@ export const Attributes = (): AttributesType => {
 
     const eat = useCallback(() => {
         setHunger(limit(hunger + 50));
-        setSleep(limit(sleep + 0));
+        setSleep(limit(sleep));
         setHygiene(limit(hygiene - 20));
         setFun(limit(fun + 15));
-    }, [
-        setHunger, hunger,
-        setSleep, sleep,
-        setHygiene, hygiene,
-        setFun, fun
-    ]);
+    }, [hunger, sleep, hygiene, fun]);
 
     const clean = useCallback(() => {
-        setHunger(limit(hunger + 0));
-        setSleep(limit(sleep + 0));
+        setHunger(limit(hunger));
+        setSleep(limit(sleep));
         setHygiene(limit(hygiene + 100));
         setFun(limit(fun + 10));
-    }, [
-        setHunger, hunger,
-        setSleep, sleep,
-        setHygiene, hygiene,
-        setFun, fun
-    ]);
+    }, [hunger, sleep, hygiene, fun]);
 
     const play = useCallback(() => {
         setHunger(limit(hunger - 5));
         setSleep(limit(sleep - 10));
         setHygiene(limit(hygiene - 5));
         setFun(limit(fun + 30));
-    }, [
-        setHunger, hunger,
-        setSleep, sleep,
-        setHygiene, hygiene,
-        setFun, fun
-    ]);
+    }, [hunger, sleep, hygiene, fun]);
 
     const medicine = useCallback(() => {
         if (message === "Crítico") {
             setHunger(limit(hunger + 75));
             setSleep(limit(sleep + 75));
-            setHygiene(limit(hygiene + 0));
+            setHygiene(limit(hygiene));
             setFun(limit(fun + 75));
         }
-    }, [
-        message,
-        setHunger, hunger,
-        setSleep, sleep,
-        setHygiene, hygiene,
-        setFun, fun
-    ]);
-
+    }, [message, hunger, sleep, hygiene, fun]);
 
     useEffect(() => {
         const timer = setInterval(() => {
             if (!light) {
-                setHunger(limit(hunger - 7));
+                setHunger(limit(hunger - 4));
                 setSleep(limit(sleep + 10));
                 setHygiene(limit(hygiene - 6));
-                setFun(limit(fun + 3));
-            }
-            if (light) {
+                setFun(limit(fun + 1));
+            } else {
                 setHunger(limit(hunger - 4));
                 setSleep(limit(sleep - 10));
                 setHygiene(limit(hygiene - 2));
-                setFun(limit(fun - 1));
+                setFun(limit(fun - 2));
             }
-        }, 1000)
-        return () => clearInterval(timer)
-    }, [limit,
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [
+        light,
+        hunger,
+        sleep,
+        hygiene,
+        fun,
         eat,
         clean,
         play,
-        medicine])
+        medicine
+    ]);
 
     return {
-        hunger, sleep, hygiene, fun,
-        eat, clean, play, medicine,
-        light, setLight
+        hunger,
+        sleep,
+        hygiene,
+        fun,
+        eat,
+        clean,
+        play,
+        medicine,
+        light,
+        setLight
     };
-}
+};
