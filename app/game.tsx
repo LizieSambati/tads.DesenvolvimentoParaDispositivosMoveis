@@ -7,7 +7,6 @@
 
 import { StyleSheet, View, TouchableOpacity, ImageBackground, SafeAreaView } from "react-native";
 import { useNavigation, useRouter } from 'expo-router';
-import { Condition } from "@/components/Condition";
 import { RootStackParamList } from "./_layout";
 import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import { CompositeNavigationProp } from "@react-navigation/native";
@@ -28,17 +27,13 @@ const Game = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <ImageBackground source={galaxy} style={styles.backgroundImage}>
-                <View style={styles.container}>
-
+                <View style={styles.goBack}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Ionicons name="arrow-back-circle-outline" size={64} color="#D3B4D9" />
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('status')}
-                    >
-                        <MaterialCommunityIcons name="alien" size={64} color="#D3B4D9" />
-                    </TouchableOpacity>
+                </View>
 
+                <View style={styles.container}>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('caraOuCoroa')}
                     >
@@ -59,6 +54,10 @@ const styles = StyleSheet.create({
         flex: 1,
         resizeMode: 'cover',
         justifyContent: 'center',
+    },
+    goBack: {
+        flexDirection: 'row',
+        padding: 12,
     },
     container: {
         justifyContent: "center",

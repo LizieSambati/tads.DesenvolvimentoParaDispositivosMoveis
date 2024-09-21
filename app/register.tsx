@@ -2,7 +2,7 @@
 // Informar os campos para cadastro: Nome; Imagem
 
 import { useCallback, useState } from "react";
-import { View, TouchableOpacity, StyleSheet, Image, SafeAreaView, ImageBackground } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Image, SafeAreaView, ImageBackground, Pressable } from "react-native";
 import { useNavigation, useRouter } from 'expo-router';
 import { RootStackParamList } from "./_layout";
 import { CompositeNavigationProp } from "@react-navigation/native";
@@ -11,30 +11,46 @@ import { FlatList, TextInput } from "react-native-gesture-handler";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import alien1 from "assets/images/alien-gangster-chefao.png";
-import alien2 from "assets/images/alien-gangster-estiloso.png";
-import alien3 from "assets/images/alien-gangster-chapado.png";
-import alien4 from "assets/images/alien-gangster-dancarino.png";
+
+
+
 import galaxy from "assets/images/galaxy2.jpg";
+import { useDatabase } from "./database/service";
+import { characters } from "components/Characters";
 
 type ScreenNavigationProp = CompositeNavigationProp<
-    StackNavigationProp<RootStackParamList, 'create'>,
+    StackNavigationProp<RootStackParamList, 'register'>,
     StackNavigationProp<RootStackParamList>
 >;
 
-const Create = () => {
+const Register = () => {
 
-    const navigation = useNavigation<ScreenNavigationProp>()
+    const navigation = useNavigation<ScreenNavigationProp>();
 
-    const [name, setName] = useState<string>('')
-    const [image, setImage] = useState<number>()
+    const [selectedCharacterIndex, setSelectedCharacterIndex] = useState<number>();
+    const [name, setName] = useState<string>('');
 
-    const imageArray = [alien1, alien2, alien3, alien4]
+    const { createTamagotchi } = useDatabase();
 
-    const create = useCallback(() => {
-        if (!name || image === undefined) return;
-        // depois de criar alien, ir para tela status
-    }, [image, name])
+    const create = async () => {
+        if (selectedCharacterIndex === undefined || !name.trim()) {
+            return;
+        }
+
+        try {
+            const selectedCharacter = characters[selectedCharacterIndex];
+            await createTamagotchi({ image: selectedCharacterIndex, name });
+            console.log("Tamagotchi criado com sucesso!");
+
+            setSelectedCharacterIndex(undefined);
+            setName('');
+
+            navigation.navigate('status');
+
+        } catch (error) {
+            console.log("Erro ao criar o Tamagotchi:", error);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -44,36 +60,41 @@ const Create = () => {
                         <Ionicons name="planet" size={48} color="#D3B4D9" />
                     </TouchableOpacity>
                 </View>
+
                 <View style={styles.container}>
                     <FlatList
                         horizontal
                         pagingEnabled
                         contentContainerStyle={styles.listContainer}
-                        data={imageArray}
+                        data={characters}
                         renderItem={({ index, item }) => {
-                            return (<TouchableOpacity onPress={() => setImage(index)}>
-                                <Image style={image === index ? styles.selectedListImage : styles.listImage} source={item} />
-                            </TouchableOpacity>)
-                        }} />
+                            return (
+                                <TouchableOpacity onPress={() => setSelectedCharacterIndex(index)}>
+                                    <Image
+                                        style={selectedCharacterIndex === index ? styles.selectedListImage : styles.listImage}
+                                        source={selectedCharacterIndex === index ? item.images.selected : item.images.notSelected}
+                                    />
+                                </TouchableOpacity>
+                            );
+                        }}
+                    />
 
                     <View style={styles.textInputContainer}>
                         <TextInput value={name} onChangeText={setName} style={styles.textInput} />
                     </View>
 
                     <View>
-                        <TouchableOpacity
-                            onPress={create}
-                        >
+                        <Pressable onPress={create}>
                             <MaterialCommunityIcons name="radioactive" size={96} color="#D3B4D9" />
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
-
                 </View>
             </ImageBackground>
         </SafeAreaView>
     );
 };
-export default Create;
+
+export default Register;
 
 
 const styles = StyleSheet.create({
@@ -114,24 +135,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 10,
     },
-    // listImage: {
-    //     aspectRatio: 4 / 4,
-    //     resizeMode: 'cover',
-    //     padding: 140,
-    //     height: 1,
-    //     margin: 4,
-    // },
-    // selectedListImage: {
-    //     aspectRatio: 4 / 4,
-    //     resizeMode: 'cover',
-    //     padding: 140,
-    //     height: 1,
-    //     shadowColor: 'yellow',
-    //     shadowOffset: { width: 0, height: 0 },
-    //     shadowOpacity: 0.8,
-    //     shadowRadius: 10,
-    //     margin: 4,
-    // },
     textInput: {
         flex: 1,
         color: 'white',
