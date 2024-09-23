@@ -15,7 +15,7 @@ export type RootStackParamList = {
   register: undefined;
   game: undefined;
   caraOuCoroa: undefined;
-  list: undefined;
+  jogoDaMemoria: undefined;
 };
 
 export type IndexScreenProps = StackScreenProps<RootStackParamList, 'index'>;
@@ -24,6 +24,7 @@ export type DetailsScreenProps = StackScreenProps<RootStackParamList, 'details'>
 export type CreateScreenProps = StackScreenProps<RootStackParamList, 'register'>;
 export type GameScreenProps = StackScreenProps<RootStackParamList, 'game'>;
 export type CaraOuCoroaScreenProps = StackScreenProps<RootStackParamList, 'caraOuCoroa'>;
+export type jogoDaMemoriaScreenProps = StackScreenProps<RootStackParamList, 'jogoDaMemoria'>;
 
 export default function RootLayout() {
   useEffect(() => {
@@ -36,19 +37,19 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen
             name="index"
-            options={{ header: () => <Header title="TAMAGOTCHI" /> }}
+            options={{ header: () => <Header title="Há muito tempo..." /> }}
           />
           <Stack.Screen
             name="status"
-            options={{ header: () => <Header title="status" /> }}
+            options={{ header: () => <Header title="Status" /> }}
           />
           <Stack.Screen
             name="details"
-            options={{ header: () => <Header title="detalhes" /> }}
+            options={{ header: () => <Header title="Detalhes" /> }}
           />
           <Stack.Screen
             name="register"
-            options={{ header: () => <Header title="novo bichinho!!!" /> }}
+            options={{ header: () => <Header title="Novo Tamagotchi" /> }}
           />
           <Stack.Screen
             name="game"
@@ -57,6 +58,10 @@ export default function RootLayout() {
           <Stack.Screen
             name="caraOuCoroa"
             options={{ header: () => <Header title="Cara Ou Coroa?" /> }}
+          />
+          <Stack.Screen
+            name="jogoDaMemoria"
+            options={{ header: () => <Header title="Jogo Da Memória" /> }}
           />
         </Stack>
       </GestureHandlerRootView>

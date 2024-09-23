@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
+
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -16,7 +17,6 @@ interface StatusIconsProps {
 }
 
 const StatusIcons = ({ containerStyle, statusStyle, textStyle, iconColor, iconSize, hunger, sleep, hygiene, fun }: StatusIconsProps) => {
-
     return (
         <View style={[styles.statusContainer, containerStyle]}>
             <View style={[styles.status, statusStyle]}>
@@ -34,7 +34,6 @@ const StatusIcons = ({ containerStyle, statusStyle, textStyle, iconColor, iconSi
             <View style={[styles.status, statusStyle]}>
                 <Text style={[styles.text, textStyle]}>{fun}%</Text>
                 <Ionicons name="star-outline" size={iconSize} color={iconColor} />
-                {/* <MaterialCommunityIcons name="star-face" size={iconSize} color={iconColor || "black"} /> */}
             </View>
         </View>
     );
@@ -50,6 +49,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 20,
+        color: '#D3B4D9'
     },
 });
 export default StatusIcons;

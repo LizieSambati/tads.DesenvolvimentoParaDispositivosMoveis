@@ -1,22 +1,19 @@
 // - Tela de cadastro de bichinhos:
 // Informar os campos para cadastro: Nome; Imagem
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { View, TouchableOpacity, StyleSheet, Image, SafeAreaView, ImageBackground, Pressable } from "react-native";
-import { useNavigation, useRouter } from 'expo-router';
+import { useNavigation } from 'expo-router';
 import { RootStackParamList } from "./_layout";
 import { CompositeNavigationProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { FlatList, TextInput } from "react-native-gesture-handler";
+import { useDatabase } from "./database/service";
+
+import { characters } from "components/Characters";
+import galaxy from "assets/images/galaxy2.jpg";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
-
-
-
-import galaxy from "assets/images/galaxy2.jpg";
-import { useDatabase } from "./database/service";
-import { characters } from "components/Characters";
 
 type ScreenNavigationProp = CompositeNavigationProp<
     StackNavigationProp<RootStackParamList, 'register'>,
@@ -26,27 +23,20 @@ type ScreenNavigationProp = CompositeNavigationProp<
 const Register = () => {
 
     const navigation = useNavigation<ScreenNavigationProp>();
-
+    const { createTamagotchi } = useDatabase();
     const [selectedCharacterIndex, setSelectedCharacterIndex] = useState<number>();
     const [name, setName] = useState<string>('');
-
-    const { createTamagotchi } = useDatabase();
 
     const create = async () => {
         if (selectedCharacterIndex === undefined || !name.trim()) {
             return;
         }
-
         try {
-            const selectedCharacter = characters[selectedCharacterIndex];
             await createTamagotchi({ image: selectedCharacterIndex, name });
             console.log("Tamagotchi criado com sucesso!");
-
             setSelectedCharacterIndex(undefined);
             setName('');
-
             navigation.navigate('status');
-
         } catch (error) {
             console.log("Erro ao criar o Tamagotchi:", error);
         }
@@ -56,14 +46,13 @@ const Register = () => {
         <SafeAreaView style={styles.safeArea}>
             <ImageBackground source={galaxy} style={styles.backgroundImage}>
                 <View style={styles.menuPlanet}>
-                    <TouchableOpacity onPress={() => navigation.navigate('index')}>
-                        <Ionicons name="planet" size={48} color="#D3B4D9" />
-                    </TouchableOpacity>
+                    <Pressable onPress={() => navigation.navigate('index')}>
+                        <Ionicons name="planet" size={48} color="#E6B400" />
+                    </Pressable>
                 </View>
-
                 <View style={styles.container}>
                     <FlatList
-                        horizontal
+                        numColumns={2}
                         pagingEnabled
                         contentContainerStyle={styles.listContainer}
                         data={characters}
@@ -78,14 +67,12 @@ const Register = () => {
                             );
                         }}
                     />
-
                     <View style={styles.textInputContainer}>
                         <TextInput value={name} onChangeText={setName} style={styles.textInput} />
                     </View>
-
                     <View>
                         <Pressable onPress={create}>
-                            <MaterialCommunityIcons name="radioactive" size={96} color="#D3B4D9" />
+                            <MaterialCommunityIcons name="radioactive" size={96} color="#E6B400" />
                         </Pressable>
                     </View>
                 </View>
@@ -93,9 +80,7 @@ const Register = () => {
         </SafeAreaView>
     );
 };
-
 export default Register;
-
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -114,7 +99,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 8,
+        padding: 18,
     },
     listContainer: {
         flexGrow: 1,
@@ -122,17 +107,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     listImage: {
-        width: 400,
-        height: 400,
+        width: 184,
+        height: 240,
         resizeMode: 'cover',
+
     },
     selectedListImage: {
-        width: 400,
-        height: 400,
+        width: 184,
+        height: 240,
         resizeMode: 'cover',
         shadowColor: 'yellow',
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.8,
+        shadowOpacity: 1,
         shadowRadius: 10,
     },
     textInput: {

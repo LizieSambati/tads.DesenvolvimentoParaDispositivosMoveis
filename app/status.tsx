@@ -5,11 +5,25 @@
 
 
 
+
+
+
+
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, ActivityIndicator, ImageBackground, SafeAreaView, Pressable } from 'react-native';
 import StatusIcons from '../components/StatusIcons';
 import { characters } from '@/components/Characters';
 import { useDatabase } from '../app/database/service';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect, useNavigation } from 'expo-router';
+import { CompositeNavigationProp, useIsFocused } from '@react-navigation/native';
+import { RootStackParamList } from './_layout';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useAttributes } from "@/components/Attributes";
+import { getConditionInfo } from "@/components/Condition";
+
+import galaxy from "assets/images/galaxy1.jpg";
+
 
 type Tamagotchi = {
   id: number;
@@ -24,135 +38,180 @@ type AttributesProps = {
   fun: number;
 };
 
+type ScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<RootStackParamList, 'status'>,
+  StackNavigationProp<RootStackParamList>
+>;
+
 const Status = () => {
+
+  const navigation = useNavigation<ScreenNavigationProp>();
+
   const { getTamagotchis } = useDatabase();
   const [tamagotchis, setTamagotchis] = useState<Tamagotchi[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // Para capturar e exibir erros
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchTamagotchis = async () => {
-      try {
-        const tamagotchisList = await getTamagotchis();
-        if (tamagotchisList.length === 0) {
-          setError("Nenhum Tamagotchi encontrado.");
-        } else {
-          setTamagotchis(tamagotchisList);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchTamagotchis = async () => {
+        try {
+          const tamagotchisList = await getTamagotchis();
+          if (tamagotchisList.length === 0) {
+            setError("Você não tem Tamagotchis");
+          } else {
+            setTamagotchis(tamagotchisList);
+          }
+        } catch (err) {
+          console.error('Erro ao buscar Tamagotchis:', err);
+          setError("Erro ao buscar Tamagotchis.");
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error('Erro ao buscar Tamagotchis:', err);
-        setError("Erro ao buscar Tamagotchis.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchTamagotchis();
-  }, []);
+      fetchTamagotchis();
+    }, [tamagotchis]));
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size="large" color="#D3B4D9" />;
   }
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <ImageBackground source={galaxy} style={styles.backgroundImage}>
+          <View style={styles.menuPlanet}>
+            <Pressable onPress={() => navigation.navigate('index')}>
+              <Ionicons name="arrow-back-circle-outline" size={48} color="#D3B4D9" />
+            </Pressable>
+          </View>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        </ImageBackground>
+      </SafeAreaView>
     );
   }
 
   return (
-    <FlatList
-      data={tamagotchis}
-      renderItem={({ item }) => <TamagotchiItem item={item} />}
-      keyExtractor={(item) => item.id.toString()}
-      contentContainerStyle={styles.statusContainer}
-    />
+    <SafeAreaView style={styles.safeArea}>
+      <ImageBackground source={galaxy} style={styles.backgroundImage}>
+        <View style={styles.menuPlanet}>
+          <Pressable onPress={() => navigation.navigate('index')}>
+            <Ionicons name="planet" size={48} color="#D3B4D9" />
+          </Pressable>
+        </View>
+        <FlatList
+          data={tamagotchis}
+          renderItem={({ item }) => <TamagotchiItem item={item} />}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.statusContainer}
+        />
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
-// Componente separado para cada item Tamagotchi
-const TamagotchiItem = ({ item }: { item: Tamagotchi }) => {
-  const { getTamagotchiState } = useDatabase();
-  const [attributes, setAttributes] = useState<AttributesProps | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+export const TamagotchiItem = ({ item }: { item: Tamagotchi }) => {
+  const navigation = useNavigation<ScreenNavigationProp>();
+
+  const { light, setLight, eat, clean, play, hunger, sleep, hygiene, fun, fetchState } = useAttributes(item.id);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    const fetchAttributes = async () => {
-      try {
-        const state = await getTamagotchiState(item.id);
-        if (!state) {
-          setError("Estado do Tamagotchi não encontrado.");
-        } else {
-          setAttributes(state);
-        }
-      } catch (err) {
-        console.error('Erro ao buscar estado do Tamagotchi:', err);
-        setError("Erro ao buscar estado do Tamagotchi.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (isFocused) {
+      fetchState();
+    }
+  }, [isFocused]);
 
-    fetchAttributes();
-  }, [item.id]);
 
-  if (loading) {
-    return <ActivityIndicator size="small" color="#0000ff" />;
-  }
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
+  const condition = getConditionInfo({ hunger, sleep, hygiene, fun }).message;
 
   return (
     <View style={styles.itemContainer}>
-      <Text style={styles.textName}>{item.name}</Text>
-      {attributes && (
+      <View style={styles.displayContainer}>
+        <Text style={styles.textName}>{item.name}</Text>
         <StatusIcons
-          hunger={attributes.hunger}
-          sleep={attributes.sleep}
-          hygiene={attributes.hygiene}
-          fun={attributes.fun}
-          iconColor="black"
-          iconSize={24}
+          hunger={hunger}
+          sleep={sleep}
+          hygiene={hygiene}
+          fun={fun}
+          iconColor="#D3B4D9"
+          iconSize={48}
+          textStyle={styles.textIcon}
         />
-      )}
-      <TouchableOpacity>
-        <Image
-          source={characters[item.image]?.charactere || require('assets/images/radioactive.png')}
-          style={styles.image}
-        />
-      </TouchableOpacity>
-    </View>
+        <View>
+          <Text style={styles.textCondition}>{condition}</Text>
+        </View>
+      </View>
+      <View>
+        <TouchableOpacity onPress={() => navigation.navigate('details', { id: item.id })}>
+          <Image
+            source={characters[item.image]?.charactere || require('assets/images/radioactive.png')}
+            style={styles.image}
+          />
+        </TouchableOpacity>
+      </View>
+    </View >
   );
 };
 
+
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+  },
   itemContainer: {
-    marginBottom: 20,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    elevation: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'center',
+    padding: 2,
+    marginLeft: 20,
+    marginBottom: 10,
+  },
+  displayContainer: {
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
   textName: {
-    fontSize: 18,
+    fontSize: 30,
     fontWeight: 'bold',
+    color: '#D3B4D9',
+    textAlign: 'left',
+    padding: 4,
+  },
+  textIcon: {
+    color: "#E6B400",
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  textCondition: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#D3B4D9',
+    textAlign: 'right',
+    padding: 4,
+  },
+  menuPlanet: {
+    flexDirection: 'row',
+    padding: 12,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 160,
     resizeMode: 'contain',
   },
   statusContainer: {
     padding: 20,
+    color: '#D3B4D9',
   },
   errorContainer: {
     flex: 1,
@@ -160,12 +219,321 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    color: 'red',
-    fontSize: 16,
+    color: "#E6B400",
+    fontSize: 26,
+    fontWeight: "500",
   },
 });
 
 export default Status;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function useCallback(arg0: () => () => void, arg1: never[]): () => undefined | void | (() => void) {
+  throw new Error('Function not implemented.');
+}
+// import React, { useEffect, useState } from 'react';
+// import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, ActivityIndicator, ImageBackground, SafeAreaView, Pressable } from 'react-native';
+// import StatusIcons from '../components/StatusIcons';
+// import { characters } from '@/components/Characters';
+// import { useDatabase } from '../app/database/service';
+// import { Ionicons } from '@expo/vector-icons';
+// import { useFocusEffect, useNavigation } from 'expo-router';
+// import { CompositeNavigationProp } from '@react-navigation/native';
+// import { RootStackParamList } from './_layout';
+// import { StackNavigationProp } from '@react-navigation/stack';
+// import { useAttributes } from "@/components/Attributes";
+
+// import galaxy from "assets/images/galaxy4.jpg";
+
+
+// type Tamagotchi = {
+//   id: number;
+//   image: number;
+//   name: string;
+// };
+
+// type AttributesProps = {
+//   hunger: number;
+//   sleep: number;
+//   hygiene: number;
+//   fun: number;
+// };
+
+// type ScreenNavigationProp = CompositeNavigationProp<
+//   StackNavigationProp<RootStackParamList, 'status'>,
+//   StackNavigationProp<RootStackParamList>
+// >;
+
+// const Status = () => {
+
+//   const navigation = useNavigation<ScreenNavigationProp>();
+
+//   const { getTamagotchis } = useDatabase();
+//   const [tamagotchis, setTamagotchis] = useState<Tamagotchi[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null); // Para capturar e exibir erros
+
+
+//   useFocusEffect(
+//     React.useCallback(() => {
+//       const fetchTamagotchis = async () => {
+//         try {
+//           const tamagotchisList = await getTamagotchis();
+//           if (tamagotchisList.length === 0) {
+//             setError("Você não tem Tamagotchis");
+//           } else {
+//             setTamagotchis(tamagotchisList);
+//           }
+//         } catch (err) {
+//           console.error('Erro ao buscar Tamagotchis:', err);
+//           setError("Erro ao buscar Tamagotchis.");
+//         } finally {
+//           setLoading(false);
+//         }
+//       };
+
+//       fetchTamagotchis();
+//     }, [tamagotchis]));
+
+//   if (loading) {
+//     return <ActivityIndicator size="large" color="#0000ff" />;
+//   }
+
+//   if (error) {
+//     return (
+//       <View style={styles.errorContainer}>
+//         <Text style={styles.errorText}>{error}</Text>
+//       </View>
+
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       <ImageBackground source={galaxy} style={styles.backgroundImage}>
+//         <View style={styles.menuPlanet}>
+//           <Pressable onPress={() => navigation.navigate('index')}>
+//             <Ionicons name="planet" size={48} color="#D3B4D9" />
+//           </Pressable>
+//         </View>
+//         <FlatList
+//           data={tamagotchis}
+//           renderItem={({ item }) => <TamagotchiItem item={item} />}
+//           keyExtractor={(item) => item.id.toString()}
+//           contentContainerStyle={styles.statusContainer}
+//         />
+//         <View>
+//           <Text style={styles.textName}>
+//             STATUS???
+//           </Text>
+//         </View>
+//       </ImageBackground>
+//     </SafeAreaView>
+//   );
+// };
+
+// // Componente separado para cada item Tamagotchi
+// export const TamagotchiItem = ({ item }: { item: Tamagotchi }) => {
+//   const navigation = useNavigation<ScreenNavigationProp>();
+//   const { light, setLight, eat, clean, play, hunger, sleep, hygiene, fun } = useAttributes(item.id);
+
+//   useFocusEffect(
+//     React.useCallback(() => {
+//       // Aqui, você pode adicionar lógica se precisar buscar algo ao focar no item
+//       // O estado já estará sendo gerenciado pelo useAttributes
+//     }, [hunger, sleep, hygiene, fun])
+//   );
+//   // const { getTamagotchiState } = useDatabase();
+//   // const [attributes, setAttributes] = useState<AttributesProps | null>(null);
+//   // const [loading, setLoading] = useState(true);
+//   // const [error, setError] = useState<string | null>(null);
+
+
+//   // useFocusEffect(
+//   //   React.useCallback(() => {
+
+//   //     const fetchAttributes = async () => {
+//   //       let state: AttributesProps | null = null;
+//   //       try {
+//   //         state = await getTamagotchiState(item.id);
+//   //         if (!state) {
+//   //           console.log('e aeeeee 1111');
+//   //           setError("Estado do Tamagotchi não encontrado.");
+//   //         } else {
+//   //           console.log('e aeeeee 22222');
+//   //           setAttributes(state);
+//   //         }
+//   //       } catch (err) {
+//   //         console.error('Erro ao buscar estado do Tamagotchi:', err);
+//   //         setError("Erro ao buscar estado do Tamagotchi.");
+//   //       } finally {
+//   //         console.log('e aeeeee44444');
+//   //         setLoading(false);
+//   //       }
+//   //     };
+
+//   //     fetchAttributes();
+//   //   }, [item.id]) // Adicione item.id como dependência
+//   // );
+//   // if (loading) {
+//   //   return <ActivityIndicator size="small" color="#D3B4D9" />;
+//   // }
+
+//   // if (error) {
+//   //   return (
+//   //     <View style={styles.errorContainer}>
+//   //       <Text style={styles.errorText}>{error}</Text>
+//   //     </View>
+//   //   );
+//   // }
+
+//   return (
+//     <View style={styles.itemContainer}>
+//       <Text style={styles.textName}>{item.name}</Text>
+//       {/* {attributes && (
+//         <StatusIcons
+//           hunger={attributes.hunger}
+//           sleep={attributes.sleep}
+//           hygiene={attributes.hygiene}
+//           fun={attributes.fun}
+//           iconColor="#D3B4D9"
+//           iconSize={24}
+//         />
+//       )} */}
+
+//       <StatusIcons
+//         hunger={hunger}
+//         sleep={sleep}
+//         hygiene={hygiene}
+//         fun={fun}
+//         iconColor="#D3B4D9"
+//         iconSize={24}
+//       />
+
+//       <TouchableOpacity onPress={() => navigation.navigate('details', { id: item.id })}>
+//         <Image
+//           source={characters[item.image]?.charactere || require('assets/images/radioactive.png')}
+//           style={styles.image}
+//         />
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//   },
+//   backgroundImage: {
+//     flex: 1,
+//     resizeMode: 'cover',
+//     justifyContent: 'center',
+//   },
+//   itemContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 2,
+//     marginTop: 20,
+//     color: '#D3B4D9',
+//   },
+//   textName: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     color: '#D3B4D9'
+//   },
+
+//   menuPlanet: {
+//     flexDirection: 'row',
+//     padding: 12,
+//   },
+//   image: {
+//     width: 100,
+//     height: 100,
+//     resizeMode: 'contain',
+//   },
+//   statusContainer: {
+//     padding: 20,
+//     color: '#D3B4D9',
+//   },
+//   errorContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   errorText: {
+//     color: '#D3B4D9',
+//     fontSize: 16,
+//   },
+// });
+
+// export default Status;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

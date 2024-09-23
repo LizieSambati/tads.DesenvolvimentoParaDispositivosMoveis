@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { ImageBackground, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ImageBackground, Pressable, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { StackNavigationProp } from '@react-navigation/stack'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from './_layout';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useDatabase } from './database/service';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import galaxy from "assets/images/galaxy3.jpg";
 
 type ScreenNavigationProp = CompositeNavigationProp<
@@ -13,17 +15,21 @@ type ScreenNavigationProp = CompositeNavigationProp<
 >;
 
 export default function Index() {
+
     const navigation = useNavigation<ScreenNavigationProp>()
+    const { clear } = useDatabase();
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <ImageBackground source={galaxy} style={styles.backgroundImage}>
-
                 <View style={styles.menuAlien}>
-                    <TouchableOpacity onPress={() => navigation.navigate('status')}>
+                    <Pressable onPress={() => navigation.navigate('status')}>
                         <MaterialCommunityIcons name="alien-outline" size={48} color="#D3B4D9" />
+                    </Pressable>
+                    <TouchableOpacity onPress={() => clear()}>
+                        <Ionicons name="warning-outline" size={48} color="#E6B400" />
                     </TouchableOpacity>
                 </View>
-
                 <View style={styles.menuCreate}>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('register')}
@@ -48,6 +54,7 @@ const styles = StyleSheet.create({
     menuAlien: {
         flexDirection: 'row',
         padding: 12,
+        justifyContent: 'space-between',
     },
     menuCreate: {
         justifyContent: "center",

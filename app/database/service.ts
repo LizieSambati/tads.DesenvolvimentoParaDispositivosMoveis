@@ -1,4 +1,5 @@
 import { useSQLiteContext } from "expo-sqlite";
+import { initDatabase } from "./initDatabase";
 
 type Tamagotchi = {
     id: number;
@@ -11,6 +12,8 @@ type AttributesProps = {
     sleep: number;
     hygiene: number;
     fun: number;
+    condition: string;
+    light: boolean;
 };
 
 export function useDatabase() {
@@ -19,16 +22,49 @@ export function useDatabase() {
     async function createTamagotchi({ image, name }: { image: number; name: string }) {
         const query = await database.prepareAsync(`
             INSERT INTO Tamagotchis (image, name) VALUES (?, ?)
+
         `);
         try {
             await query.executeAsync([image, name]);
+            createTamagotchiStates()
         } catch (error) {
             console.log("Erro ao criar Tamagotchi:", error);
         } finally {
             await query.finalizeAsync();
         }
+
     }
 
+    async function createTamagotchiStates() {
+        const tamagotchiId = await database.getAllSync(
+            `SELECT max(id) as max FROM Tamagotchis`
+        );
+
+        if (tamagotchiId && tamagotchiId[0] !== null) {
+            const row = tamagotchiId[0] as {
+                max: number;
+            };
+
+            const initialHunger = 17;
+            const initialSleep = 79;
+            const initialHygiene = 34;
+            const initialFun = 62;
+            const initialCondition = "Ok";
+            const initialLight = true
+
+            const query = await database.prepareAsync(`
+                INSERT OR REPLACE INTO TamagotchiStates (hunger, sleep, hygiene, fun, condition, light, tamagotchiId)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `);
+            try {
+                await query.executeAsync([initialHunger, initialSleep, initialHygiene, initialFun, initialCondition, initialLight, row.max]);
+            } catch (error) {
+                console.log("Erro ao criar Tamagotchi:", error);
+            } finally {
+                await query.finalizeAsync();
+            }
+        }
+    }
 
     async function deleteTamagotchi(id: number) {
         const query = await database.prepareAsync(`
@@ -55,14 +91,34 @@ export function useDatabase() {
         }
     }
 
-
-
-    async function updateTamagotchi(id: number, state: AttributesProps) {
-        const query = await database.prepareAsync(`
-            INSERT OR REPLACE INTO TamagotchiStates (id, hunger, sleep, hygiene, fun) VALUES (?, ?, ?, ?, ?)
-        `);
+    async function getTamagotchiImage(id: number): Promise<number | null> {
+        const query = await database.getAllAsync(`
+            SELECT image FROM Tamagotchis WHERE id = ` + id);
         try {
-            await query.executeAsync([id, state.hunger, state.sleep, state.hygiene, state.fun]);
+            if (query && query[0] !== null) {
+                const row = query[0] as {
+                    image: number;
+                };
+                return row.image;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        return 0;
+    }
+
+    async function updateTamagotchi(
+        id: number,
+        { hunger, sleep, hygiene, fun, condition, light }: AttributesProps,
+
+    ) {
+        const query = await database.prepareAsync(`
+          UPDATE TamagotchiStates SET hunger = ?, sleep = ?, hygiene = ?, fun = ?, condition = ?, light = ? 
+          WHERE tamagotchiId = ?
+        `);
+
+        try {
+            await query.executeAsync([hunger, sleep, hygiene, fun, condition, light, id]);
         } catch (error) {
             console.error(error);
         } finally {
@@ -70,34 +126,33 @@ export function useDatabase() {
         }
     }
 
-
-
     async function getTamagotchiState(id: number): Promise<AttributesProps | null> {
         try {
             const results = await database.getAllSync(
                 `SELECT hunger, sleep, hygiene, fun FROM TamagotchiStates WHERE tamagotchiId = ?`,
                 [id]
-            );
 
-            // Verifica se a query retornou algum resultado
+            );
+            console.log('getTamagoshiState: ', results)
             if (results && results.length > 0) {
-                // Força o TypeScript a reconhecer o formato da linha retornada
                 const row = results[0] as {
                     hunger: number;
                     sleep: number;
                     hygiene: number;
                     fun: number;
+                    condition: string;
+                    light: boolean
                 };
-
-                // Retorna os atributos
                 return {
                     hunger: row.hunger,
                     sleep: row.sleep,
                     hygiene: row.hygiene,
                     fun: row.fun,
+                    condition: row.condition,
+                    light: row.light,
                 };
             } else {
-                return null; // Caso não haja resultados
+                return null;
             }
         } catch (error) {
             console.error("Erro ao buscar o estado do Tamagotchi:", error);
@@ -105,360 +160,16 @@ export function useDatabase() {
         }
     }
 
+    async function clear() {
+        try {
+            await database.execAsync(`DROP TABLE IF EXISTS TamagotchiStates;`);
+            await database.execAsync(`DROP TABLE IF EXISTS Tamagotchis;`);
 
+            await initDatabase(database);
+        } catch (error) {
+            console.error("Erro ao limpar o banco de dados:", error);
+        }
+    }
 
-
-    // async function getTamagotchiState(id: number): Promise<AttributesProps | null> {
-
-    //     try {
-    //         const db = await database;
-    //         const results = await db.getAllSync(
-    //             `SELECT * FROM TamagotchiStates WHERE id = ?`,
-    //             [id]
-    //         );
-    //         if (results.length > 0) {
-    //             return results[0] as AttributesProps;
-    //         } else {
-    //             return null;
-    //         }
-    //     } catch (error) {
-    //         console.error("Erro ao buscar o estado do Tamagotchi:", error);
-    //         return null;
-    //     }
-    // }
-
-    return { createTamagotchi, deleteTamagotchi, getTamagotchis, updateTamagotchi, getTamagotchiState };
+    return { createTamagotchi, deleteTamagotchi, getTamagotchis, updateTamagotchi, getTamagotchiState, clear, getTamagotchiImage };
 }
-
-
-
-
-
-
-
-
-// import { SQLiteDatabase, useSQLiteContext } from "expo-sqlite";
-
-// type Tamagotchi = {
-//     id: number;
-//     image: number;
-//     name: string;
-// };
-
-// type AttributesProps = {
-//     hunger: number;
-//     sleep: number;
-//     hygiene: number;
-//     fun: number;
-// };
-
-// export function useDatabase() {
-//     const database = useSQLiteContext();
-
-//     async function createTamagotchi({ image, name }: { image: number; name: string }) {
-//         const query = await database.prepareAsync(`
-//             INSERT INTO Tamagotchis (image, name) VALUES (?, ?)
-//         `);
-//         try {
-//             await query.executeAsync([image, name]);
-//         } catch (error) {
-//             console.log(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function deleteTamagotchi(id: number) {
-//         const query = await database.prepareAsync(`
-//             DELETE FROM Tamagotchis WHERE id = ?
-//         `);
-//         try {
-//             await query.executeAsync([id]);
-//         } catch (error) {
-//             console.log(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function getTamagotchis(): Promise<Tamagotchi[]> {
-//         try {
-//             const result = await database.getAllAsync(`
-//                 SELECT * FROM Tamagotchis;
-//             `);
-//             return result as Tamagotchi[];
-//         } catch (error) {
-//             console.error("Erro ao buscar Tamagotchis:", error);
-//             throw error;
-//         }
-//     }
-
-//     async function updateTamagotchi(id: number, state: AttributesProps) {
-//         const query = await database.prepareAsync(`
-//             INSERT OR REPLACE INTO TamagotchiStates (id, hunger, sleep, hygiene, fun) VALUES (?, ?, ?, ?, ?)
-//         `);
-//         try {
-//             await query.executeAsync([id, state.hunger, state.sleep, state.hygiene, state.fun]);
-//         } catch (error) {
-//             console.error(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function getTamagotchiState(id: number): Promise<AttributesProps | null> {
-
-//         try {
-//             const db = await database;
-//             const results = await db.getAllSync(
-//                 `SELECT * FROM TamagotchiStates WHERE id = ?`,
-//                 [id]
-//             );
-//             if (results.length > 0) {
-//                 return results[0] as AttributesProps;
-//             } else {
-//                 return null;
-//             }
-//         } catch (error) {
-//             console.error("Erro ao buscar o estado do Tamagotchi:", error);
-//             return null;
-//         }
-//     }
-
-//     return { createTamagotchi, deleteTamagotchi, getTamagotchis, updateTamagotchi, getTamagotchiState };
-// }
-
-
-
-
-
-
-
-
-
-// try {
-//     const result = await database.getAllAsync(`
-//         SELECT * FROM TamagotchiStates WHERE id = ?
-//     `, [id]);
-//     return result.length > 0 ? result[0] as AttributesProps : null;
-// } catch (error) {
-//     console.error("Erro ao buscar o estado do Tamagotchi:", error);
-//     return null;
-// }
-
-
-
-
-
-// import { useSQLiteContext } from "expo-sqlite";
-
-// type Tamagotchi = {
-//     id: number;
-//     image: number;
-//     name: string;
-// };
-
-// type AttributesProps = {
-//     hunger: number;
-//     sleep: number;
-//     hygiene: number;
-//     fun: number;
-// };
-
-// export function useDatabase() {
-//     const database = useSQLiteContext();
-
-//     async function createTamagotchi({ image, name }: { image: number; name: string }) {
-//         const query = await database.prepareAsync(`
-//             INSERT INTO Tamagotchis (image, name) VALUES ($image, $name)
-//         `);
-//         try {
-//             await query.executeAsync({ $image: image, $name: name });
-//         } catch (error) {
-//             console.log(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function deleteTamagotchi(id: number) {
-//         const query = await database.prepareAsync(`
-//             DELETE FROM Tamagotchis WHERE id = ?
-//         `);
-//         try {
-//             await query.executeAsync([id]);
-//         } catch (error) {
-//             console.log(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function getTamagotchis(): Promise<Tamagotchi[]> {
-//         try {
-//             const result = await database.getAllAsync(`
-//                 SELECT * FROM Tamagotchis;
-//             `);
-//             return result as Tamagotchi[];
-//         } catch (error) {
-//             console.error("Erro ao buscar Tamagotchis:", error);
-//             throw error;
-//         }
-//     }
-
-//     async function updateTamagotchi(id: number, state: AttributesProps) {
-//         const query = await database.prepareAsync(`
-//             INSERT OR REPLACE INTO TamagotchiStates (id, hunger, sleep, hygiene, fun) VALUES ($id, $hunger, $sleep, $hygiene, $fun)
-//         `);
-//         try {
-//             await query.executeAsync({
-//                 $id: id,
-//                 $hunger: state.hunger,
-//                 $sleep: state.sleep,
-//                 $hygiene: state.hygiene,
-//                 $fun: state.fun,
-//             });
-//         } catch (error) {
-//             console.error(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function getTamagotchiState(id: number): Promise<AttributesProps | null> {
-//         try {
-//             // Obtenha a instância do banco de dados
-//             const db = await database;
-
-//             // Execute a consulta SQL
-//             const results = await db.getAllSync(
-//                 `SELECT * FROM TamagotchiStates WHERE id = ?`,
-//                 [id]
-//             );
-
-//             // Verifique se há resultados e retorne o primeiro
-//             if (results.length > 0) {
-//                 return results[0] as AttributesProps;
-//             } else {
-//                 return null;
-//             }
-//         } catch (error) {
-//             console.error("Erro ao buscar o estado do Tamagotchi:", error);
-//             return null;
-//         }
-
-//     async function getTamagotchiState(id: number): Promise<AttributesProps | null> {
-//         try {
-//             const result = await database.getAllSync(`
-//                 SELECT * FROM TamagotchiStates WHERE id = ?
-//             `, [id]);
-//         GPT AQUI DÁ ERRO -> return result ? result : null;
-//         } catch (error) {
-//             console.error("Erro ao buscar o estado do Tamagotchi:", error);
-//             return null;
-//         }
-//     }
-// }
-
-//     return { createTamagotchi, deleteTamagotchi, getTamagotchis, updateTamagotchi, getTamagotchiState };
-// }
-
-
-
-
-
-
-
-
-
-// import { useSQLiteContext } from "expo-sqlite"
-
-// type Tamagotchi = {
-//     id: number;
-//     image: number;
-//     name: string;
-// };
-
-// type AttributesProps = {
-//     hunger: number;
-//     sleep: number;
-//     hygiene: number;
-//     fun: number;
-// };
-
-
-// export function useDatabase() {
-//     const database = useSQLiteContext()
-
-//     async function createTamagotchi({ image, name }: { image: number, name: string }) {
-//         const query = await database.prepareAsync(`
-//             INSERT INTO Tamagotchis (image, name) VALUES ($image, $name)
-//             `)
-//         try {
-//             await query.executeAsync({ $image: image, $name: name })
-
-//         } catch (error) {
-//             console.log(error)
-//         } finally {
-//             await query.finalizeAsync()
-//         }
-//     }
-
-//     async function deleteTamagotchi(id: number) {
-//         const query = await database.prepareAsync(`
-//             DELETE FROM Tamagotchis WHERE id = ?
-//         `);
-//         try {
-//             await query.executeAsync([id]);
-//         } catch (error) {
-//             console.log(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function getTamagotchis(): Promise<Tamagotchi[]> {
-//         try {
-//             const result = await database.getAllAsync(`
-//                 SELECT * FROM Tamagotchis;
-//             `);
-//             return result as Tamagotchi[];
-//         } catch (error) {
-//             console.error("Erro ao buscar Tamagotchis:", error);
-//             throw error;
-//         }
-//     }
-
-//     async function updateTamagotchi(id: number, state: AttributesProps) {
-//         const query = await database.prepareAsync(`
-//             INSERT OR REPLACE INTO TamagotchiStates (id, hunger, sleep, hygiene, fun) VALUES ($id, $hunger, $sleep, $hygiene, $fun)
-//         `);
-//         try {
-//             await query.executeAsync({
-//                 $id: id,
-//                 $hunger: state.hunger,
-//                 $sleep: state.sleep,
-//                 $hygiene: state.hygiene,
-//                 $fun: state.fun,
-//             });
-//         } catch (error) {
-//             console.error(error);
-//         } finally {
-//             await query.finalizeAsync();
-//         }
-//     }
-
-//     async function getTamagotchiState(id: number): Promise<AttributesProps | null> {
-//         try {
-//             const result = await database.getAllSync(`
-//                 SELECT * FROM TamagotchiStates WHERE id = ?
-//             `, [id]);
-//             return result ? result : null;
-//         } catch (error) {
-//             console.error("Erro ao buscar o estado do Tamagotchi:", error);
-//             return null;
-//         }
-//     }
-
-//     return { createTamagotchi, deleteTamagotchi, getTamagotchis, updateTamagotchi, getTamagotchiState }
-// }
