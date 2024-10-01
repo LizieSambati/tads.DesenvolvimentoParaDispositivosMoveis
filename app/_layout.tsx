@@ -13,7 +13,7 @@ export type RootStackParamList = {
   status: undefined;
   details: { id: number };
   register: undefined;
-  game: undefined;
+  game: { id: number };
   caraOuCoroa: undefined;
   jogoDaMemoria: undefined;
 };
